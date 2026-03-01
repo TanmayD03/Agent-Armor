@@ -365,7 +365,7 @@ def mcp_intercept(payload_file: Optional[Path], domain: str) -> None:
     if result.allowed:
         console.print(
             Panel(
-                f"[bold green]✅  MCP payload CLEARED by Zero-Trust proxy[/bold green]\n"
+                "[bold green]✅  MCP payload CLEARED by Zero-Trust proxy[/bold green]\n"
                 + (f"Warnings: {result.warnings}" if result.warnings else "No warnings."),
                 title=f"Tool: {result.tool_name}",
                 border_style="green",
