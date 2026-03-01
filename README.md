@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/TanmayD03/Agent-Armor/main/docs/logo.png" alt="AgentArmor" width="120"/>
-
 # 🛡️ AgentArmor
 
 ### Zero-Trust Security Middleware for AI-Generated Code
