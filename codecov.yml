@@ -1,0 +1,29 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%          # fail if overall coverage drops below 80%
+        threshold: 2%        # allow up to 2% drop before flagging
+    patch:
+      default:
+        target: 70%          # new code in PRs must be at least 70% covered
+        threshold: 5%
+
+ignore:
+  - "tests/**"
+  - "examples/**"
+  - "vulnerability_museum/**"
+  - "badge_server.py"
+  - "setup.py"
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: true      # only comment on PRs that change coverage
+
+flags:
+  unittests:
+    paths:
+      - agent_armor/
+      - cli/
+    carryforward: true       # carry forward coverage when a flag is missing
