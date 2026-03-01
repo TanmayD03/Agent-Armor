@@ -1,0 +1,107 @@
+# .agent-armor.toml
+# =================
+# AgentArmor Zero-Trust Middleware — Project Configuration
+# Place this file in your project root.
+#
+# All settings have safe defaults; only override what you need.
+
+[pipeline]
+# Which stages to run. Disable stages you don't need for performance.
+enable_secret_scrubber   = true
+enable_ast_hardener      = true
+enable_dtg_engine        = true
+enable_slopsquatting     = true
+enable_policy_engine     = true
+enable_attestation       = true
+enable_shadow_chain      = true
+
+[policy]
+# What status causes armor to exit non-zero (useful in CI).
+# Options: "blocked", "warned", "never"
+fail_on = "blocked"
+
+# Whether WARN status in CLI commands exits with code 0 or 1.
+warn_is_error = false
+
+# Block ALL critical findings regardless of individual stage settings.
+block_on_critical = true
+
+[secrets]
+# Entropy threshold for high-entropy string detection (bits per character).
+# Lower = more sensitive (more false positives).
+# Recommended: 4.5 — 5.0
+entropy_threshold = 4.5
+
+# Minimum length for entropy scanning to apply.
+entropy_min_length = 20
+
+# Extra regex patterns to treat as secrets (in addition to built-ins).
+# Format: list of [pattern, label] pairs.
+# custom_patterns = [
+#   ["MY_SECRET_[A-Z0-9]{32}", "Custom Secret"],
+# ]
+
+[packages]
+# Validate imports against PyPI (disable in air-gapped environments).
+validate_against_pypi = true
+
+# PyPI check cache TTL in seconds (default: 1 hour).
+cache_ttl_seconds = 3600
+
+# Maximum Levenshtein edit-distance to flag as a potential typosquat.
+typosquat_max_distance = 2
+
+# Minimum PyPI download count to consider a package "established".
+min_downloads = 1000
+
+# Minimum age in days before a package is considered "established".
+min_age_days = 7
+
+# Additional known-malicious packages to always block.
+# blocklist = ["evil-package", "totally-legit-requests"]
+
+[attestation]
+# Version header embedded in signed code.
+version = "1.0.0"
+
+# Algorithm used for attestation signing.
+# Currently only "sha256" is supported.
+algorithm = "sha256"
+
+[shadow_chain]
+# Directory to store the persistent attestation chain.
+# Relative paths are resolved from the project root.
+chain_dir = ".agent-armor"
+
+# Maximum number of entries to keep per file (0 = unlimited).
+max_history_per_file = 0
+
+[domains]
+# Optional domain isolation: map source directories to logical domains.
+# AgentArmor warns when code from one domain imports from another.
+# frontend = ["src/frontend/", "public/", "static/"]
+# backend  = ["src/api/", "src/db/", "src/services/"]
+# shared   = ["src/common/", "src/types/"]
+
+[output]
+# Output format for `armor scan` CLI command.
+# Options: "rich" (default, colourised tables), "json", "plain"
+format = "rich"
+
+# Show the hardened diff in scan output.
+show_diff = true
+
+# Maximum lines of diff to display (0 = unlimited).
+diff_max_lines = 50
+
+[ci]
+# Settings for running in CI/CD pipelines.
+
+# Exit code when status is BLOCKED (default: 1).
+blocked_exit_code = 1
+
+# Exit code when status is WARNED (default: 0 unless warn_is_error=true).
+warned_exit_code  = 0
+
+# Suppress colour output in CI (auto-detected via NO_COLOR env var too).
+no_color = false

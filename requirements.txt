@@ -1,0 +1,24 @@
+# AgentArmor Dependencies
+
+# CLI framework
+click>=8.1.7
+
+# Beautiful terminal output
+rich>=13.7.0
+
+# HTTP requests for PyPI/npm validation
+requests>=2.31.0
+
+# Data validation and modeling
+pydantic>=2.5.0
+
+# Terminal colors (used as rich fallback)
+colorama>=0.4.6
+
+# Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
+
+# Optional: tree-sitter for multi-language AST support
+# tree-sitter>=0.22.0
+# tree-sitter-languages>=1.10.2

@@ -1,0 +1,6 @@
+/target
+Cargo.lock
+*.shadow-chain.json
+*.hardened.py
+*.hardened.js
+*.hardened.ts

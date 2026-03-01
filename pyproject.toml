@@ -1,0 +1,76 @@
+﻿[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-armor"
+version = "1.0.0"
+description = "Zero-Trust Middleware for Agentic Coding"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Tanmay Dikey", email = "enceladus441@gmail.com" }
+]
+keywords = [
+    "security", "ai", "code-analysis", "zero-trust",
+    "agentic-coding", "ast", "attestation", "vulnerability-scanner"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Security",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+dependencies = [
+    "click>=8.1.7",
+    "rich>=13.7.0",
+    "requests>=2.31.0",
+    "pydantic>=2.5.0",
+    "colorama>=0.4.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+    "build>=1.0.0",
+]
+
+[project.scripts]
+armor = "cli.armor:cli"
+
+[project.urls]
+Homepage = "https://github.com/tanmaydikey/agent-armor"
+Repository = "https://github.com/tanmaydikey/agent-armor"
+"Bug Tracker" = "https://github.com/tanmaydikey/agent-armor/issues"
+Documentation = "https://github.com/tanmaydikey/agent-armor#readme"
+Changelog = "https://github.com/tanmaydikey/agent-armor/releases"
+"Security Policy" = "https://github.com/tanmaydikey/agent-armor/blob/main/SECURITY.md"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agent_armor*", "cli*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
