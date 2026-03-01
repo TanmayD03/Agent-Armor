@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 <img src="https://raw.githubusercontent.com/tanmaydikey/agent-armor/main/docs/logo.png" alt="AgentArmor" width="120"/>
 

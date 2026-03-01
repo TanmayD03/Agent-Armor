@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
+# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
 # SPDX-License-Identifier: MIT
 """
 AgentArmor — AST Hardening Engine
@@ -22,9 +22,9 @@ Detects:
 from __future__ import annotations
 
 import ast
-import textwrap
+import re as _re_module
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List
 
 
 @dataclass
@@ -119,7 +119,6 @@ _WEAK_CRYPTO_MODULES: frozenset[str] = frozenset({
 # ---------------------------------------------------------------------------
 # Structural patterns known to cause polynomial/exponential backtracking.
 # We check the *string literal* passed to re.compile() / re.match() etc.
-import re as _re_module
 
 _REDOS_PATTERNS: list[tuple[_re_module.Pattern[str], str]] = [
     # (a+)+ / (a*)* / (a+)* nested quantifiers
@@ -301,9 +300,9 @@ class _SecurityVisitor(ast.NodeVisitor):
                                 line_number=node.lineno,
                                 severity="HIGH",
                                 description=(
-                                    f"Potential SSRF: HTTP call with a dynamic URL argument. "
-                                    f"If the URL is derived from user input an attacker can reach "
-                                    f"internal services (AWS metadata, localhost, etc.)."
+                                    "Potential SSRF: HTTP call with a dynamic URL argument. "
+                                    "If the URL is derived from user input an attacker can reach "
+                                    "internal services (AWS metadata, localhost, etc.)."
                                 ),
                                 suggestion=(
                                     "Validate the URL against an allowlist of permitted hosts before making "
@@ -531,7 +530,6 @@ class ASTHardener:
 
     def _check_hardcoded_paths(self, source_code: str) -> List[ASTFinding]:
         """Flag writes to sensitive system paths."""
-        import re
         findings: List[ASTFinding] = []
         sensitive_patterns = [
             r"/etc/passwd", r"/etc/shadow", r"/etc/sudoers",

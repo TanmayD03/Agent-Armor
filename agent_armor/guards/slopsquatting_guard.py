@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
+# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
 # SPDX-License-Identifier: MIT
 """
 AgentArmor — Slopsquatting Guard
@@ -38,10 +38,10 @@ import ast
 import json
 import re
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set
 
 try:
     import requests

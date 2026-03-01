@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
+# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
 # SPDX-License-Identifier: MIT
 """
 AgentArmor — Cryptographic Attestation Engine
@@ -170,8 +170,6 @@ class AttestationEngine:
         Build an invariants dict from pipeline findings.
         Used so the signature covers the *security posture* of the code.
         """
-        from .ast_hardener import ASTFinding  # avoid circular at module level
-
         critical_ast = [f for f in ast_findings if f.severity == "CRITICAL"]
         sql_issues   = [f for f in ast_findings if f.node_type == "SQLInjection"]
         cmd_issues   = [f for f in ast_findings if f.node_type == "CommandInjection"]

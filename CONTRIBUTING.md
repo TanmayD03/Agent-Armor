@@ -1,4 +1,4 @@
-﻿# Contributing to AgentArmor
+# Contributing to AgentArmor
 
 Thank you for your interest in making AI-generated code safer! 🛡️
 

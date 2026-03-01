@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
+# Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
 # SPDX-License-Identifier: MIT
 """
 AgentArmor — Secret Scrubber

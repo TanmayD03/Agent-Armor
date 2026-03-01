@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # Copyright (c) 2026 Tanmay Dikey <enceladus441@gmail.com>
 # SPDX-License-Identifier: MIT
 """
