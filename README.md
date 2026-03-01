@@ -11,7 +11,7 @@
 [![CI](https://github.com/TanmayD03/Agent-Armor/actions/workflows/ci.yml/badge.svg)](https://github.com/TanmayD03/Agent-Armor/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/TanmayD03/Agent-Armor/branch/main/graph/badge.svg)](https://codecov.io/gh/TanmayD03/Agent-Armor)
 [![PyPI version](https://img.shields.io/pypi/v/kvlr.svg)](https://pypi.org/project/kvlr/)
-[![Downloads](https://pepy.tech/badge/kvlr)](https://pepy.tech/project/kvlr)
+[![Downloads](https://img.shields.io/pypi/dm/kvlr.svg)](https://pypi.org/project/kvlr/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13-blue)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Security: Zero-Trust](https://img.shields.io/badge/Security-Zero--Trust-critical)](https://github.com/TanmayD03/Agent-Armor)
