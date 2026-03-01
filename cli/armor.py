@@ -7,10 +7,10 @@ A professional developer experience built with Click + Rich.
 
 Commands
 --------
-  armor scan <file>            Scan & harden a source file
+  kvlr scan <file>            Scan & harden a source file
   armor scan-dir <dir>         Scan all source files in a directory
   armor verify <file>          Verify file attestation against shadow-chain
-  armor check-deps <file>      Validate imports against PyPI / npm
+  kvlr check-deps <file>      Validate imports against PyPI / npm
   armor mcp-intercept <json>   Intercept an MCP tool-call payload
   armor museum [--id N]        Browse the Vulnerability Museum
   armor badge <repo>           Generate a Secure-by-Agent badge
@@ -663,7 +663,7 @@ nump==1.24.0             # <-- typosquats 'numpy'
         "fix": "Always validate package names against PyPI before installing.",
         "hardened": """\
 # ✅ AgentArmor Validated requirements.txt
-# armor check-deps requirements.txt output:
+# kvlr check-deps requirements.txt output:
 # ✅ fastapi         — 50M+ downloads, 6 years old
 # ✅ openai          — 10M+ downloads, 3 years old
 # ✅ numpy           — 100M+ downloads, 20 years old

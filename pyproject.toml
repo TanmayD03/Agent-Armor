@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "agent-armor"
+name = "kvlr"
 version = "1.0.0"
 description = "Zero-Trust Middleware for Agentic Coding"
 readme = "README.md"
@@ -57,15 +57,15 @@ dev = [
 ]
 
 [project.scripts]
-armor = "cli.armor:cli"
+kvlr = "cli.armor:cli"
 
 [project.urls]
-Homepage = "https://github.com/tanmaydikey/agent-armor"
-Repository = "https://github.com/tanmaydikey/agent-armor"
-"Bug Tracker" = "https://github.com/tanmaydikey/agent-armor/issues"
-Documentation = "https://github.com/tanmaydikey/agent-armor#readme"
-Changelog = "https://github.com/tanmaydikey/agent-armor/releases"
-"Security Policy" = "https://github.com/tanmaydikey/agent-armor/blob/main/SECURITY.md"
+Homepage = "https://github.com/TanmayD03/Agent-Armor"
+Repository = "https://github.com/TanmayD03/Agent-Armor"
+"Bug Tracker" = "https://github.com/TanmayD03/Agent-Armor/issues"
+Documentation = "https://github.com/TanmayD03/Agent-Armor#readme"
+Changelog = "https://github.com/TanmayD03/Agent-Armor/releases"
+"Security Policy" = "https://github.com/TanmayD03/Agent-Armor/blob/main/SECURITY.md"
 
 [tool.setuptools.packages.find]
 where = ["."]

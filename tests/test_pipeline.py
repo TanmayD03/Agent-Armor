@@ -67,7 +67,7 @@ class TestPipelineStatus:
         clean = "def hello():\n    return 'world'\n"
         report = armor.process(clean, filename="hello.py")
         if report.attestation:
-            assert "@agent-armor-attestation:" in report.hardened_code
+            assert "@kvlr-attestation:" in report.hardened_code
 
     def test_processing_time_recorded(self, armor: AgentArmor):
         report = armor.process("x = 1\n")
@@ -110,7 +110,7 @@ class TestPipelineBlockNotice:
         evil = "eval(input())\n"
         report = armor.process(evil)
         assert report.is_blocked
-        assert "AGENT-ARMOR BLOCKED" in report.hardened_code
+        assert "KVLR BLOCKED" in report.hardened_code
 
     def test_original_code_preserved(self):
         armor = AgentArmor(validate_packages=False)

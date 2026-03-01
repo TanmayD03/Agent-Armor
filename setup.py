@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="agent-armor",
+    name="kvlr",
     version="1.0.0",
     description="Zero-Trust Middleware for Agentic Coding",
     long_description=open("README.md", encoding="utf-8").read(),
@@ -23,7 +23,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "armor=cli.armor:cli",
+            "kvlr=cli.armor:cli",
         ],
     },
     classifiers=[

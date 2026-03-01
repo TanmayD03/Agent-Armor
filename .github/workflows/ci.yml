@@ -80,7 +80,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
           flags: unittests
-          name: agent-armor-coverage
+          name: kvlr-coverage
 
   # ──────────────────────────────────────────────
   # Job 2: AgentArmor Self-Attestation Check
@@ -108,7 +108,7 @@ jobs:
       - name: Run AgentArmor on source files
         run: |
           echo "🛡️ Running AgentArmor self-attestation on repository source..."
-          armor scan agent_armor/ --report --output self-attest-report.json || true
+          kvlr scan agent_armor/ --report --output self-attest-report.json || true
           echo "Self-attestation complete."
 
       - name: Verify shadow-chain integrity
@@ -124,7 +124,7 @@ jobs:
       - name: Upload attestation report
         uses: actions/upload-artifact@v4
         with:
-          name: agent-armor-attestation
+          name: kvlr-attestation
           path: self-attest-report.json
         if: always()
 
@@ -152,7 +152,7 @@ jobs:
       - name: Validate dependencies
         run: |
           echo "📦 Running Slopsquatting Guard on requirements.txt..."
-          armor check-deps requirements.txt
+          kvlr check-deps requirements.txt
 
   # ──────────────────────────────────────────────
   # Job 4: Publish to PyPI (on GitHub Release)

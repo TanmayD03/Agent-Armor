@@ -1,4 +1,4 @@
-# .agent-armor.toml
+# .kvlr.toml
 # =================
 # AgentArmor Zero-Trust Middleware — Project Configuration
 # Place this file in your project root.
@@ -71,7 +71,7 @@ algorithm = "sha256"
 [shadow_chain]
 # Directory to store the persistent attestation chain.
 # Relative paths are resolved from the project root.
-chain_dir = ".agent-armor"
+chain_dir = ".kvlr"
 
 # Maximum number of entries to keep per file (0 = unlimited).
 max_history_per_file = 0

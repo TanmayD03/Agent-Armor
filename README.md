@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/tanmaydikey/agent-armor/main/docs/logo.png" alt="AgentArmor" width="120"/>
+<img src="https://raw.githubusercontent.com/TanmayD03/Agent-Armor/main/docs/logo.png" alt="AgentArmor" width="120"/>
 
 # 🛡️ AgentArmor
 
@@ -8,14 +8,14 @@
 
 *The layer between your AI coding tool and your production codebase.*
 
-[![CI](https://github.com/tanmaydikey/agent-armor/actions/workflows/ci.yml/badge.svg)](https://github.com/tanmaydikey/agent-armor/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/tanmaydikey/agent-armor/branch/main/graph/badge.svg)](https://codecov.io/gh/tanmaydikey/agent-armor)
-[![PyPI version](https://img.shields.io/pypi/v/agent-armor.svg)](https://pypi.org/project/agent-armor/)
-[![Downloads](https://pepy.tech/badge/agent-armor)](https://pepy.tech/project/agent-armor)
+[![CI](https://github.com/TanmayD03/Agent-Armor/actions/workflows/ci.yml/badge.svg)](https://github.com/TanmayD03/Agent-Armor/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/TanmayD03/Agent-Armor/branch/main/graph/badge.svg)](https://codecov.io/gh/TanmayD03/Agent-Armor)
+[![PyPI version](https://img.shields.io/pypi/v/kvlr.svg)](https://pypi.org/project/kvlr/)
+[![Downloads](https://pepy.tech/badge/kvlr)](https://pepy.tech/project/kvlr)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13-blue)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Security: Zero-Trust](https://img.shields.io/badge/Security-Zero--Trust-critical)](https://github.com/tanmaydikey/agent-armor)
-[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/tanmaydikey/agent-armor)
+[![Security: Zero-Trust](https://img.shields.io/badge/Security-Zero--Trust-critical)](https://github.com/TanmayD03/Agent-Armor)
+[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/TanmayD03/Agent-Armor)
 
 <br/>
 
@@ -74,7 +74,7 @@ def get_user_profile(user_id):
 ## 🚀 30-Second Quickstart
 
 ```bash
-pip install agent-armor
+pip install kvlr
 ```
 
 ```python
@@ -110,9 +110,9 @@ print(f"Threats: {len(report.ast_findings)} found")  # → 3 found
 Or via the CLI:
 
 ```bash
-armor scan my_ai_generated_file.py
-armor scan my_ai_generated_file.py --report --output report.json
-armor check-deps requirements.txt   # slopsquatting / dependency confusion
+kvlr scan my_ai_generated_file.py
+kvlr scan my_ai_generated_file.py --report --output report.json
+kvlr check-deps requirements.txt   # slopsquatting / dependency confusion
 ```
 
 ---
@@ -302,11 +302,11 @@ security checks, hardcoded debug flags, private IPs in config.
 
 ```bash
 # Option 1: PyPI (recommended)
-pip install agent-armor
+pip install kvlr
 
 # Option 2: Latest from source
-git clone https://github.com/tanmaydikey/agent-armor.git
-cd agent-armor
+git clone https://github.com/TanmayD03/Agent-Armor.git
+cd kvlr
 pip install -e .
 ```
 
@@ -325,16 +325,16 @@ armor --version
 
 ```bash
 # Scan a Python file for vulnerabilities
-armor scan suspicious_code.py
+kvlr scan suspicious_code.py
 
 # Scan with detailed JSON report
-armor scan suspicious_code.py --report --output report.json
+kvlr scan suspicious_code.py --report --output report.json
 
 # Verify attestation integrity (CI/CD use)
 armor verify suspicious_code.py --hash a3f9b2c1...
 
 # Validate dependencies against PyPI/npm
-armor check-deps requirements.txt
+kvlr check-deps requirements.txt
 
 # Run the Vulnerability Museum demo
 armor museum
@@ -508,7 +508,7 @@ AgentArmor is grounded in published 2025–2026 security research — not just i
 Add this to your README to show your codebase is AgentArmor-protected:
 
 ```markdown
-[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/yourusername/agent-armor)
+[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/yourusername/kvlr)
 ```
 
 ---
@@ -518,7 +518,7 @@ Add this to your README to show your codebase is AgentArmor-protected:
 **Tanmay Dikey**
 - 📧 [enceladus441@gmail.com](mailto:enceladus441@gmail.com)
 - 🐙 [github.com/tanmaydikey](https://github.com/tanmaydikey)
-- 💼 [github.com/tanmaydikey/agent-armor](https://github.com/tanmaydikey/agent-armor)
+- 💼 [github.com/TanmayD03/Agent-Armor](https://github.com/TanmayD03/Agent-Armor)
 
 ---
 
@@ -527,10 +527,10 @@ Add this to your README to show your codebase is AgentArmor-protected:
 Show the world your codebase is AgentArmor-protected:
 
 ```markdown
-[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/tanmaydikey/agent-armor)
+[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/TanmayD03/Agent-Armor)
 ```
 
-[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/tanmaydikey/agent-armor)
+[![AgentArmor Protected](https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen)](https://github.com/TanmayD03/Agent-Armor)
 
 ---
 

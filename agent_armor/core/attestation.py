@@ -12,7 +12,7 @@ How it works
 
 2. This hash is embedded as a structured comment at the top of the file:
 
-       # @agent-armor-attestation: <sha256-hex>
+       # @kvlr-attestation: <sha256-hex>
        # @invariants: {"auth_required": false, "no_dangerous_sinks": true, ...}
        # @version: 1.0.0  @timestamp: 2026-02-25T12:00:00Z
 
@@ -46,7 +46,7 @@ from typing import Any, Dict, Optional
 
 _ATTESTATION_VERSION = "1.0.0"
 _HEADER_RE = re.compile(
-    r"^#\s*@agent-armor-attestation:\s*([a-f0-9]{64})",
+    r"^#\s*@kvlr-attestation:\s*([a-f0-9]{64})",
     re.MULTILINE,
 )
 _INVARIANTS_RE = re.compile(
@@ -69,7 +69,7 @@ class Attestation:
         """Render the attestation as header comment lines."""
         inv_json = json.dumps(self.invariants, separators=(",", ":"))
         return (
-            f"# @agent-armor-attestation: {self.signature}\n"
+            f"# @kvlr-attestation: {self.signature}\n"
             f"# @invariants: {inv_json}\n"
             f"# @version: {self.version}  @timestamp: {self.timestamp}\n"
         )
@@ -156,7 +156,7 @@ class AttestationEngine:
         return actual_sig == expected_sig
 
     def extract_signature(self, signed_code: str) -> Optional[str]:
-        """Extract the @agent-armor-attestation hash from *signed_code*, if present."""
+        """Extract the @kvlr-attestation hash from *signed_code*, if present."""
         match = _HEADER_RE.search(signed_code)
         return match.group(1) if match else None
 
@@ -195,16 +195,16 @@ class AttestationEngine:
         inv_str = json.dumps(invariants, sort_keys=True)
         # Normalise line endings for cross-platform stability
         normalised = code.replace("\r\n", "\n").strip()
-        return f"AGENT-ARMOR-V1\n{inv_str}\n{normalised}"
+        return f"KVLR-V1\n{inv_str}\n{normalised}"
 
     @staticmethod
     def _strip_header(code: str) -> str:
-        """Remove existing @agent-armor-* header lines."""
+        """Remove existing @kvlr-* header lines."""
         lines = code.splitlines(keepends=True)
         cleaned = [
             line
             for line in lines
-            if not line.lstrip().startswith("# @agent-armor-")
+            if not line.lstrip().startswith("# @kvlr-")
             and not line.lstrip().startswith("# @invariants:")
             and not line.lstrip().startswith("# @version:")
         ]

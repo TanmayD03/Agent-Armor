@@ -98,7 +98,7 @@ class BadgeHandler(BaseHTTPRequestHandler):
         # ── /health ──────────────────────────────────────────────────────────
         if parsed.path == "/health":
             self._send(
-                json.dumps({"status": "ok", "service": "agent-armor-badge-server"}),
+                json.dumps({"status": "ok", "service": "kvlr-badge-server"}),
                 content_type="application/json",
             )
             return

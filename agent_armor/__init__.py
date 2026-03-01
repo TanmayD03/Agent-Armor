@@ -8,7 +8,7 @@ Version 1.0.0
 Author
 ------
   Tanmay Dikey <enceladus441@gmail.com>
-  https://github.com/tanmaydikey/agent-armor
+  https://github.com/TanmayD03/Agent-Armor
 
 Quick start::
 
@@ -26,6 +26,6 @@ __version__ = "1.0.0"
 __author__ = "Tanmay Dikey"
 __email__ = "enceladus441@gmail.com"
 __description__ = "Zero-Trust Middleware for Agentic Coding"
-__url__ = "https://github.com/tanmaydikey/agent-armor"
+__url__ = "https://github.com/TanmayD03/Agent-Armor"
 
 __all__ = ["AgentArmor", "ArmorReport"]

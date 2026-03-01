@@ -53,7 +53,7 @@ class TestEmbedAndExtract:
         code = "x = 1\n"
         a = engine.sign(code, {})
         embedded = engine.embed(code, a)
-        assert "@agent-armor-attestation:" in embedded
+        assert "@kvlr-attestation:" in embedded
 
     def test_embed_includes_invariants(self, engine):
         code = "x = 1\n"
@@ -79,7 +79,7 @@ class TestEmbedAndExtract:
         a2 = engine.sign(code + "y = 2\n", {})
         embedded_v2 = engine.embed(embedded_v1, a2)
         # Should only have one attestation header
-        count = embedded_v2.count("@agent-armor-attestation:")
+        count = embedded_v2.count("@kvlr-attestation:")
         assert count == 1
 
 

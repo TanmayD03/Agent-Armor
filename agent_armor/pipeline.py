@@ -380,7 +380,7 @@ class AgentArmor:
     def _build_block_notice(reasons: List[str]) -> str:
         lines = [
             "# " + "=" * 62,
-            "# ❌ [AGENT-ARMOR BLOCKED] — Zero-Trust Policy Violation",
+            "# ❌ [KVLR BLOCKED] — Zero-Trust Policy Violation",
             "# This code was REJECTED by the AgentArmor security pipeline.",
             "# Reasons:",
         ]

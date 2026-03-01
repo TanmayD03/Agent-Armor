@@ -27,8 +27,8 @@ performance work.
 1. **Fork** the repository on GitHub
 2. **Clone** your fork locally:
    ```bash
-   git clone https://github.com/<your-username>/agent-armor.git
-   cd agent-armor
+   git clone https://github.com/<your-username>/kvlr.git
+   cd kvlr
    ```
 3. **Create a feature branch** — never work directly on `main`:
    ```bash

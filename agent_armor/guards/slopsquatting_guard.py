@@ -171,7 +171,7 @@ class SlopsquattingGuard:
         self._offline = offline
         self._cache: Dict[str, dict] = {}
         self._cache_timestamps: Dict[str, float] = {}
-        self._cache_path = cache_path or Path(".agent-armor") / "pypi-cache.json"
+        self._cache_path = cache_path or Path(".kvlr") / "pypi-cache.json"
         if not offline:
             self._load_disk_cache()
 
