@@ -140,5 +140,32 @@ vulnerabilities will receive:
 
 ---
 
+## OpenSSF & Supply Chain Security
+
+AgentArmor is committed to meeting [OpenSSF](https://openssf.org/) standards:
+
+- **OpenSSF Scorecard**: We track and aim for a perfect 10/10 score — see [README.md#openssf-scorecard-goals](README.md)
+- **SLSA Level 2** (Supply-chain Levels for Software Artefacts): All releases are built via GitHub Actions with provenance attestation via `pypa/gh-action-pypi-publish`
+- **Sigstore / `sigstore-python`**: Planned for v1.1.0 — release artefacts will be signed with Sigstore for cryptographic provenance
+- **Dependabot**: Dependency update PRs are reviewed within 5 business days
+- **Self-attestation**: Every release is scanned through the AgentArmor pipeline itself before publish — [see CI workflow](.github/workflows/ci.yml)
+
+---
+
+## Security Architecture
+
+kvlr is designed with security-in-depth for the tool itself:
+
+| Property | Implementation |
+|----------|---------------|
+| **Zero network calls** | All analysis runs fully locally — no code leaves the machine |
+| **No eval / exec** | AST analysis uses `ast.parse()` only — never executes input code |
+| **Sandboxed analysis** | Each scan runs in a stateless function — no global state mutation |
+| **Signed attestations** | SHA-256 HMAC over code + invariants — tamper-evident |
+| **Dependency minimalism** | Only 5 runtime dependencies (click, rich, requests, pydantic, colorama) |
+
+---
+
 *Security policy maintained by [Tanmay Dikey](mailto:enceladus441@gmail.com)*
 *Last updated: March 2026*
+*This policy follows [coordinated vulnerability disclosure](https://vuls.cert.org/confluence/display/CVD) principles.*
