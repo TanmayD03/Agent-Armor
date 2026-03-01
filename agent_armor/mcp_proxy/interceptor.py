@@ -72,6 +72,7 @@ _READ_SENSITIVE = re.compile(
 @dataclass
 class MCPInterceptResult:
     """Result of an MCP tool call interception."""
+
     allowed: bool
     tool_name: str
     original_payload: Dict[str, Any]
@@ -170,11 +171,11 @@ class MCPInterceptor:
         # Route to the appropriate handler
         handler = {
             "write_to_file": self._handle_write,
-            "edit_file":     self._handle_write,
-            "create_file":   self._handle_write,
-            "run_code":      self._handle_run_code,
+            "edit_file": self._handle_write,
+            "create_file": self._handle_write,
+            "run_code": self._handle_run_code,
             "install_package": self._handle_install,
-            "read_file":     self._handle_read,
+            "read_file": self._handle_read,
             "execute_command": self._handle_execute_command,
         }.get(tool_name, self._handle_unknown)
 
@@ -236,7 +237,9 @@ class MCPInterceptor:
             # Replace content with hardened version
             modified_params["content"] = report.hardened_code
             if report.secret_findings:
-                warnings.append(f"{len(report.secret_findings)} secret(s) scrubbed from code.")
+                warnings.append(
+                    f"{len(report.secret_findings)} secret(s) scrubbed from code."
+                )
             if report.ast_findings:
                 warnings.append(f"{len(report.ast_findings)} AST finding(s) in code.")
 
@@ -296,6 +299,7 @@ class MCPInterceptor:
         """Intercept install_package — run Slopsquatting guard."""
         package = params.get("package", params.get("name", ""))
         from ..guards.slopsquatting_guard import SlopsquattingGuard
+
         # Use offline mode when validate_packages=False (e.g., in tests).
         guard = SlopsquattingGuard(offline=not self._validate_packages)
         findings = guard.check_single(package)
@@ -341,7 +345,7 @@ class MCPInterceptor:
             r"rm\s+-rf\s+/",
             r"dd\s+if=",
             r"mkfs\.",
-            r":\(\)\{",           # fork bomb
+            r":\(\)\{",  # fork bomb
             r"chmod\s+777\s+/",
             r"curl\s+.*\|\s*(?:sh|bash|python)",
             r"wget\s+.*\|\s*(?:sh|bash|python)",
@@ -375,6 +379,7 @@ class MCPInterceptor:
 # ---------------------------------------------------------------------------
 # Optional FastAPI HTTP server (if fastapi is installed)
 # ---------------------------------------------------------------------------
+
 
 def create_mcp_app(upstream_url: str = "http://localhost:3000"):  # type: ignore[return]
     """
@@ -421,7 +426,9 @@ def create_mcp_app(upstream_url: str = "http://localhost:3000"):  # type: ignore
         if result.warnings:
             response_data["_agent_armor_warnings"] = result.warnings
         if result.armor_report and result.armor_report.attestation:
-            response_data["_agent_armor_attestation"] = result.armor_report.attestation.signature
+            response_data["_agent_armor_attestation"] = (
+                result.armor_report.attestation.signature
+            )
 
         return JSONResponse(content=response_data, status_code=upstream.status_code)
 

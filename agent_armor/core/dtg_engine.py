@@ -48,10 +48,11 @@ from typing import Dict, List, Optional, Set
 @dataclass
 class DTGFinding:
     """A tainted-flow finding from the DTG Engine."""
-    source: str          # e.g. "input()"
-    sink: str            # e.g. "db.execute()"
+
+    source: str  # e.g. "input()"
+    sink: str  # e.g. "db.execute()"
     line_number: int
-    severity: str        # CRITICAL | HIGH | MEDIUM
+    severity: str  # CRITICAL | HIGH | MEDIUM
     description: str
     suggestion: str
     auto_fix_applied: bool = False
@@ -78,10 +79,15 @@ _TAINT_SOURCES: Set[str] = {
 }
 
 _TAINT_SOURCE_ATTRS: Set[str] = {
-    "args", "json", "form", "data", "files",
-    "get_json", "values",
-    "environ",       # os.environ
-    "argv",          # sys.argv
+    "args",
+    "json",
+    "form",
+    "data",
+    "files",
+    "get_json",
+    "values",
+    "environ",  # os.environ
+    "argv",  # sys.argv
 }
 
 _TAINT_SINKS: Dict[str, tuple[str, str, str]] = {
@@ -119,15 +125,30 @@ _TAINT_SINKS: Dict[str, tuple[str, str, str]] = {
 }
 
 _SANITISER_NAMES: Set[str] = {
-    "int", "float", "bool", "str",      # type casts
-    "escape", "quote",                  # HTML/URL escaping
-    "strip", "replace", "lstrip", "rstrip",
+    "int",
+    "float",
+    "bool",
+    "str",  # type casts
+    "escape",
+    "quote",  # HTML/URL escaping
+    "strip",
+    "replace",
+    "lstrip",
+    "rstrip",
     # regex validation
-    "match", "fullmatch", "search",
+    "match",
+    "fullmatch",
+    "search",
 }
 
 _SANITISER_KEYWORDS: Set[str] = {
-    "valid", "sanitiz", "sanitise", "clean", "escape", "encode", "filter",
+    "valid",
+    "sanitiz",
+    "sanitise",
+    "clean",
+    "escape",
+    "encode",
+    "filter",
 }
 
 
@@ -155,9 +176,7 @@ class DTGEngine:
         analyser.visit(tree)
         return analyser.findings
 
-    def inject_validation(
-        self, source_code: str, findings: List[DTGFinding]
-    ) -> str:
+    def inject_validation(self, source_code: str, findings: List[DTGFinding]) -> str:
         """
         When DTG finds unsanitised flows that reach database sinks,
         prepend a Pydantic validation schema to the file.
@@ -259,13 +278,17 @@ class _TaintFlowAnalyser(ast.NodeVisitor):
             self._check_calls_in_expr(value, tainted)
             if self._is_tainted(value, tainted):
                 # Propagate taint to all assignment targets
-                targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+                targets = (
+                    stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+                )
                 for target in targets:
                     if isinstance(target, ast.Name):
                         tainted.add(target.id)
             elif self._is_sanitised(value):
                 # Remove taint if result of sanitisation is assigned
-                targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+                targets = (
+                    stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+                )
                 for target in targets:
                     if isinstance(target, ast.Name):
                         tainted.discard(target.id)
@@ -346,7 +369,9 @@ class _TaintFlowAnalyser(ast.NodeVisitor):
                 return True
             # request.args.get(), request.json.get(), etc.
             # (method called on a taint-source attribute)
-            if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Attribute):
+            if isinstance(func, ast.Attribute) and isinstance(
+                func.value, ast.Attribute
+            ):
                 if func.value.attr in _TAINT_SOURCE_ATTRS:
                     return True
             # tainted_var.method() — method called on an already-tainted variable
@@ -369,14 +394,18 @@ class _TaintFlowAnalyser(ast.NodeVisitor):
         # f-strings: tainted if any interpolated expression is tainted
         if isinstance(node, ast.JoinedStr):
             return any(
-                self._is_tainted(val.value, tainted)  # val.value = the expression inside {}
+                self._is_tainted(
+                    val.value, tainted
+                )  # val.value = the expression inside {}
                 for val in node.values
                 if isinstance(val, ast.FormattedValue)
             )
 
         # Binary ops: tainted if either side is
         if isinstance(node, ast.BinOp):
-            return self._is_tainted(node.left, tainted) or self._is_tainted(node.right, tainted)
+            return self._is_tainted(node.left, tainted) or self._is_tainted(
+                node.right, tainted
+            )
 
         return False
 
@@ -405,7 +434,9 @@ class _TaintFlowAnalyser(ast.NodeVisitor):
             if isinstance(func, ast.Name):
                 return f"{func.id}()"
             if isinstance(func, ast.Attribute):
-                return f"{ast.unparse(func) if hasattr(ast, 'unparse') else func.attr}()"
+                return (
+                    f"{ast.unparse(func) if hasattr(ast, 'unparse') else func.attr}()"
+                )
         if isinstance(node, ast.Attribute):
             try:
                 return ast.unparse(node) if hasattr(ast, "unparse") else node.attr

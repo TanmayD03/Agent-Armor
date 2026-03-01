@@ -55,7 +55,9 @@ BANNER = """
 
 @click.group()
 @click.version_option("1.0.0", prog_name="armor")
-@click.option("--quiet", "-q", is_flag=True, help="Suppress banner and non-essential output.")
+@click.option(
+    "--quiet", "-q", is_flag=True, help="Suppress banner and non-essential output."
+)
 @click.pass_context
 def cli(ctx: click.Context, quiet: bool) -> None:
     """🛡️  AgentArmor — Zero-Trust Middleware for Agentic Coding."""
@@ -73,15 +75,27 @@ def cli(ctx: click.Context, quiet: bool) -> None:
 @cli.command()
 @click.argument("file", type=click.Path(exists=True, path_type=Path))
 @click.option("--lang", "-l", default=None, help="Override language detection.")
-@click.option("--output", "-o", type=click.Path(path_type=Path), default=None,
-              help="Write hardened code to this file.")
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Write hardened code to this file.",
+)
 @click.option("--report", "-r", is_flag=True, help="Print JSON report to stdout.")
-@click.option("--report-file", type=click.Path(path_type=Path), default=None,
-              help="Write JSON report to this file.")
+@click.option(
+    "--report-file",
+    type=click.Path(path_type=Path),
+    default=None,
+    help="Write JSON report to this file.",
+)
 @click.option("--no-scrub", is_flag=True, help="Skip secret scrubbing.")
 @click.option("--no-deps", is_flag=True, help="Skip package dependency check.")
-@click.option("--strict", is_flag=True,
-              help="Exit with code 1 on any critical finding (for CI/CD).")
+@click.option(
+    "--strict",
+    is_flag=True,
+    help="Exit with code 1 on any critical finding (for CI/CD).",
+)
 @click.pass_context
 def scan(
     ctx: click.Context,
@@ -114,8 +128,12 @@ def scan(
     elif not quiet:
         console.print(
             Panel(
-                Syntax(armor_report.hardened_code, "python", theme="monokai",
-                       line_numbers=True),
+                Syntax(
+                    armor_report.hardened_code,
+                    "python",
+                    theme="monokai",
+                    line_numbers=True,
+                ),
                 title="[bold green]Hardened Output[/bold green]",
                 border_style="green",
             )
@@ -130,7 +148,9 @@ def scan(
 
     # CI/CD exit code
     if strict and armor_report.is_blocked:
-        console.print("[bold red]🛑  Strict mode: exiting with code 1 (BLOCKED)[/bold red]")
+        console.print(
+            "[bold red]🛑  Strict mode: exiting with code 1 (BLOCKED)[/bold red]"
+        )
         sys.exit(1)
     if strict and armor_report.critical_count > 0:
         console.print(
@@ -140,7 +160,9 @@ def scan(
 
 
 @cli.command("scan-dir")
-@click.argument("directory", type=click.Path(exists=True, file_okay=False, path_type=Path))
+@click.argument(
+    "directory", type=click.Path(exists=True, file_okay=False, path_type=Path)
+)
 @click.option("--fail-fast", is_flag=True, help="Stop on first BLOCKED file.")
 @click.option("--report-file", type=click.Path(path_type=Path), default=None)
 @click.pass_context
@@ -155,7 +177,8 @@ def scan_dir(
 
     extensions = {".py", ".js", ".ts"}
     files = [
-        p for p in directory.rglob("*")
+        p
+        for p in directory.rglob("*")
         if p.suffix in extensions and ".venv" not in p.parts
     ]
 
@@ -181,8 +204,8 @@ def scan_dir(
 
         status_str = {
             "APPROVED": "[bold green]APPROVED[/bold green]",
-            "WARNED":   "[bold yellow]WARNED[/bold yellow]",
-            "BLOCKED":  "[bold red]BLOCKED[/bold red]",
+            "WARNED": "[bold yellow]WARNED[/bold yellow]",
+            "BLOCKED": "[bold red]BLOCKED[/bold red]",
         }.get(r.status, r.status)
 
         attest = r.attestation.signature[:12] + "..." if r.attestation else "N/A"
@@ -217,8 +240,12 @@ def scan_dir(
 
 @cli.command()
 @click.argument("file", type=click.Path(exists=True, path_type=Path))
-@click.option("--hash", "expected_hash", default=None,
-              help="Expected attestation hash (if not embedded in file).")
+@click.option(
+    "--hash",
+    "expected_hash",
+    default=None,
+    help="Expected attestation hash (if not embedded in file).",
+)
 @click.pass_context
 def verify(
     ctx: click.Context,
@@ -304,10 +331,14 @@ def check_deps(file: Path, strict: bool) -> None:
         findings = guard.scan(code)
 
     if not findings:
-        console.print("[bold green]✅  All imports verified — no suspicious packages found.[/bold green]")
+        console.print(
+            "[bold green]✅  All imports verified — no suspicious packages found.[/bold green]"
+        )
         return
 
-    table = Table(title="Slopsquatting Guard — Findings", box=box.ROUNDED, show_lines=True)
+    table = Table(
+        title="Slopsquatting Guard — Findings", box=box.ROUNDED, show_lines=True
+    )
     table.add_column("Package", style="cyan")
     table.add_column("Check", style="yellow")
     table.add_column("Severity", justify="center")
@@ -341,8 +372,13 @@ def check_deps(file: Path, strict: bool) -> None:
 
 @cli.command("mcp-intercept")
 @click.argument("payload_file", required=False, type=click.Path(path_type=Path))
-@click.option("--domain", "-d", default="default", show_default=True,
-              help="Agent domain for isolation checks.")
+@click.option(
+    "--domain",
+    "-d",
+    default="default",
+    show_default=True,
+    help="Agent domain for isolation checks.",
+)
 def mcp_intercept(payload_file: Optional[Path], domain: str) -> None:
     """Intercept an MCP tool-call payload (file or stdin)."""
     from agent_armor.mcp_proxy.interceptor import MCPInterceptor
@@ -366,7 +402,11 @@ def mcp_intercept(payload_file: Optional[Path], domain: str) -> None:
         console.print(
             Panel(
                 "[bold green]✅  MCP payload CLEARED by Zero-Trust proxy[/bold green]\n"
-                + (f"Warnings: {result.warnings}" if result.warnings else "No warnings."),
+                + (
+                    f"Warnings: {result.warnings}"
+                    if result.warnings
+                    else "No warnings."
+                ),
                 title=f"Tool: {result.tool_name}",
                 border_style="green",
             )
@@ -386,8 +426,13 @@ def mcp_intercept(payload_file: Optional[Path], domain: str) -> None:
 
 
 @cli.command()
-@click.option("--id", "museum_id", type=int, default=None,
-              help="Show a specific vulnerability case (1-5).")
+@click.option(
+    "--id",
+    "museum_id",
+    type=int,
+    default=None,
+    help="Show a specific vulnerability case (1-5).",
+)
 def museum(museum_id: Optional[int]) -> None:
     """🏛️  Browse the Vulnerability Museum — real AI-generated vulnerabilities."""
     _run_museum(museum_id)
@@ -636,7 +681,9 @@ def _run_museum(museum_id: Optional[int]) -> None:
     if museum_id:
         cases = [c for c in _MUSEUM_CASES if c["id"] == museum_id]
         if not cases:
-            console.print(f"[red]No museum case with id {museum_id}. Valid IDs: 1-5.[/red]")
+            console.print(
+                f"[red]No museum case with id {museum_id}. Valid IDs: 1-5.[/red]"
+            )
             return
     else:
         cases = _MUSEUM_CASES
@@ -652,9 +699,13 @@ def _run_museum(museum_id: Optional[int]) -> None:
             )
         )
         console.print("[bold red]❌ Vulnerable (AI Output):[/bold red]")
-        console.print(Syntax(case["vulnerable"], "python", theme="monokai", line_numbers=True))
+        console.print(
+            Syntax(case["vulnerable"], "python", theme="monokai", line_numbers=True)
+        )
         console.print("\n[bold green]✅ AgentArmor Hardened:[/bold green]")
-        console.print(Syntax(case["hardened"], "python", theme="monokai", line_numbers=True))
+        console.print(
+            Syntax(case["hardened"], "python", theme="monokai", line_numbers=True)
+        )
         console.print()
 
 
@@ -662,12 +713,13 @@ def _run_museum(museum_id: Optional[int]) -> None:
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _print_report(armor_report, file: Path, quiet: bool) -> None:
     """Print a concise summary table for a single-file scan."""
     status_map = {
         "APPROVED": ("[bold green]✅ APPROVED[/bold green]", "green"),
-        "WARNED":   ("[bold yellow]⚠️  WARNED[/bold yellow]",  "yellow"),
-        "BLOCKED":  ("[bold red]🛑 BLOCKED[/bold red]",        "red"),
+        "WARNED": ("[bold yellow]⚠️  WARNED[/bold yellow]", "yellow"),
+        "BLOCKED": ("[bold red]🛑 BLOCKED[/bold red]", "red"),
     }
     label, color = status_map.get(armor_report.status, (armor_report.status, "white"))
 
@@ -683,22 +735,28 @@ def _print_report(armor_report, file: Path, quiet: bool) -> None:
     table.add_row(
         "Attestation",
         (armor_report.attestation.signature[:24] + "...")
-        if armor_report.attestation else "[red]N/A (BLOCKED)[/red]",
+        if armor_report.attestation
+        else "[red]N/A (BLOCKED)[/red]",
     )
 
-    console.print(
-        Panel(table, title="AgentArmor Report", border_style=color)
-    )
+    console.print(Panel(table, title="AgentArmor Report", border_style=color))
 
     if not quiet and armor_report.ast_findings:
-        finding_table = Table(title="AST Findings", box=box.SIMPLE_HEAD, show_lines=True)
+        finding_table = Table(
+            title="AST Findings", box=box.SIMPLE_HEAD, show_lines=True
+        )
         finding_table.add_column("Severity", justify="center")
         finding_table.add_column("Type")
         finding_table.add_column("Line", justify="right")
         finding_table.add_column("Description")
         finding_table.add_column("Suggestion", style="dim")
         for f in armor_report.ast_findings:
-            sev_colors = {"CRITICAL": "red", "HIGH": "orange3", "MEDIUM": "yellow", "LOW": "blue"}
+            sev_colors = {
+                "CRITICAL": "red",
+                "HIGH": "orange3",
+                "MEDIUM": "yellow",
+                "LOW": "blue",
+            }
             c = sev_colors.get(f.severity, "white")
             finding_table.add_row(
                 f"[{c}]{f.severity}[/{c}]",

@@ -220,7 +220,9 @@ class AgentArmor:
         print("🔍 [Stage 1/5] Scanning for hardcoded secrets...")
         hardened, secret_findings = self._secret_scrubber.scrub(raw_code)
         if secret_findings:
-            print(f"   ⚠️  {len(secret_findings)} secret(s) scrubbed → env var references.")
+            print(
+                f"   ⚠️  {len(secret_findings)} secret(s) scrubbed → env var references."
+            )
 
         # ── Stage 2: AST Hardening ────────────────────────────────────
         print("🌲 [Stage 2/5] Running AST security analysis...")
@@ -341,7 +343,8 @@ class AgentArmor:
 
         if self.block_on_dangerous_sinks:
             dangerous = [
-                f for f in ast_findings
+                f
+                for f in ast_findings
                 if f.node_type in ("DangerousFunction", "CommandInjection")
                 and f.severity in ("CRITICAL", "HIGH")
             ]
@@ -392,11 +395,12 @@ class AgentArmor:
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _severity_icon(severity: str) -> str:
     return {
         "CRITICAL": "🚨",
-        "HIGH":     "🔴",
-        "MEDIUM":   "🟡",
-        "LOW":      "🔵",
-        "ERROR":    "❌",
+        "HIGH": "🔴",
+        "MEDIUM": "🟡",
+        "LOW": "🔵",
+        "ERROR": "❌",
     }.get(severity, "⚪")

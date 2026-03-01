@@ -40,8 +40,9 @@ from typing import Any, Dict, List, Optional
 @dataclass
 class PolicyViolation:
     """A single policy rule violation."""
+
     rule_name: str
-    severity: str        # CRITICAL | HIGH | MEDIUM | LOW
+    severity: str  # CRITICAL | HIGH | MEDIUM | LOW
     line_number: int
     description: str
     remediation: str
@@ -86,23 +87,30 @@ class SensitivePathWriteRule(Rule):
     severity = "CRITICAL"
 
     _SENSITIVE = [
-        r"/etc/passwd", r"/etc/shadow", r"/etc/sudoers",
-        r"~/.ssh/", r"~/.aws/credentials",
+        r"/etc/passwd",
+        r"/etc/shadow",
+        r"/etc/sudoers",
+        r"~/.ssh/",
+        r"~/.aws/credentials",
         r"C:\\Windows\\System32",
     ]
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         for i, line in enumerate(code.splitlines(), 1):
             for path in self._SENSITIVE:
                 if path.lower() in line.lower():
-                    violations.append(PolicyViolation(
-                        rule_name=self.name,
-                        severity=self.severity,
-                        line_number=i,
-                        description=f"Attempt to reference/write sensitive path: {path}",
-                        remediation="Remove or parameterise the sensitive path reference.",
-                    ))
+                    violations.append(
+                        PolicyViolation(
+                            rule_name=self.name,
+                            severity=self.severity,
+                            line_number=i,
+                            description=f"Attempt to reference/write sensitive path: {path}",
+                            remediation="Remove or parameterise the sensitive path reference.",
+                        )
+                    )
         return violations
 
 
@@ -123,7 +131,9 @@ class DeleteWithoutUserIDRule(Rule):
         re.IGNORECASE,
     )
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         try:
             tree = ast.parse(code)
@@ -138,38 +148,44 @@ class DeleteWithoutUserIDRule(Rule):
 
             # Check: does the function have a user_id param?
             param_names = {a.arg for a in node.args.args}
-            has_user_id = any("user_id" in p or "userid" in p.lower() for p in param_names)
+            has_user_id = any(
+                "user_id" in p or "userid" in p.lower() for p in param_names
+            )
 
             # Check: is there an early guard (if not user_id / if user_id is None)?
             has_guard = self._has_user_id_guard(node)
 
             if not has_user_id:
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=node.lineno,
-                    description=(
-                        f'Function "{node.name}" performs a destructive operation '
-                        f"but has no 'user_id' parameter."
-                    ),
-                    remediation=(
-                        "Add 'user_id: int' as a required parameter to all destructive functions."
-                    ),
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=node.lineno,
+                        description=(
+                            f'Function "{node.name}" performs a destructive operation '
+                            f"but has no 'user_id' parameter."
+                        ),
+                        remediation=(
+                            "Add 'user_id: int' as a required parameter to all destructive functions."
+                        ),
+                    )
+                )
             elif not has_guard:
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity="HIGH",
-                    line_number=node.lineno,
-                    description=(
-                        f'Function "{node.name}" has a user_id parameter but '
-                        f"no explicit guard check for None/empty."
-                    ),
-                    remediation=(
-                        "Add: 'if not user_id: raise ValueError(\"user_id required\")' "
-                        "at the top of the function."
-                    ),
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity="HIGH",
+                        line_number=node.lineno,
+                        description=(
+                            f'Function "{node.name}" has a user_id parameter but '
+                            f"no explicit guard check for None/empty."
+                        ),
+                        remediation=(
+                            "Add: 'if not user_id: raise ValueError(\"user_id required\")' "
+                            "at the top of the function."
+                        ),
+                    )
+                )
 
         return violations
 
@@ -209,12 +225,14 @@ class DomainIsolationRule(Rule):
     severity = "HIGH"
 
     _BACKEND_PATTERNS = [
-        re.compile(r'os\.environ\[.*(DB_|DATABASE_|SECRET_|ADMIN_)', re.IGNORECASE),
-        re.compile(r'os\.getenv\(.*(DB_|DATABASE_|SECRET_|ADMIN_)', re.IGNORECASE),
-        re.compile(r'\b(psycopg2|sqlalchemy|pymongo|redis\.Redis)\b'),
+        re.compile(r"os\.environ\[.*(DB_|DATABASE_|SECRET_|ADMIN_)", re.IGNORECASE),
+        re.compile(r"os\.getenv\(.*(DB_|DATABASE_|SECRET_|ADMIN_)", re.IGNORECASE),
+        re.compile(r"\b(psycopg2|sqlalchemy|pymongo|redis\.Redis)\b"),
     ]
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         domain = context.get("domain", "")
         if domain.lower() != "frontend":
             return []
@@ -223,18 +241,20 @@ class DomainIsolationRule(Rule):
         for i, line in enumerate(code.splitlines(), 1):
             for pattern in self._BACKEND_PATTERNS:
                 if pattern.search(line):
-                    violations.append(PolicyViolation(
-                        rule_name=self.name,
-                        severity=self.severity,
-                        line_number=i,
-                        description=(
-                            f"Frontend-domain agent accessing backend resource: '{line.strip()}'"
-                        ),
-                        remediation=(
-                            "Frontend code must not access database connections or backend secrets. "
-                            "Use an API call instead."
-                        ),
-                    ))
+                    violations.append(
+                        PolicyViolation(
+                            rule_name=self.name,
+                            severity=self.severity,
+                            line_number=i,
+                            description=(
+                                f"Frontend-domain agent accessing backend resource: '{line.strip()}'"
+                            ),
+                            remediation=(
+                                "Frontend code must not access database connections or backend secrets. "
+                                "Use an API call instead."
+                            ),
+                        )
+                    )
                     break
         return violations
 
@@ -254,7 +274,9 @@ class AdminEndpointAuthRule(Rule):
         re.IGNORECASE,
     )
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         try:
             tree = ast.parse(code)
@@ -287,17 +309,19 @@ class AdminEndpointAuthRule(Rule):
                 func_src = ""
 
             if not self._AUTH_RE.search(func_src):
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=node.lineno,
-                    description=(
-                        f'Admin function "{node.name}" has no visible auth/permission check.'
-                    ),
-                    remediation=(
-                        "Add an explicit authorisation check (e.g., if not user.is_admin: raise PermissionError)."
-                    ),
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=node.lineno,
+                        description=(
+                            f'Admin function "{node.name}" has no visible auth/permission check.'
+                        ),
+                        remediation=(
+                            "Add an explicit authorisation check (e.g., if not user.is_admin: raise PermissionError)."
+                        ),
+                    )
+                )
         return violations
 
 
@@ -310,7 +334,9 @@ class JWTAlgorithmRule(Rule):
     name = "RULE-005-JWT-ALGORITHM-REQUIRED"
     severity = "HIGH"
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         try:
             tree = ast.parse(code)
@@ -326,24 +352,27 @@ class JWTAlgorithmRule(Rule):
             # Check if algorithms= kwarg is present
             kw_names = {kw.arg for kw in node.keywords}
             if "algorithms" not in kw_names:
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=node.lineno,
-                    description=(
-                        "jwt.decode() called without 'algorithms' parameter. "
-                        "This may allow the 'none' algorithm attack."
-                    ),
-                    remediation=(
-                        "Always specify: jwt.decode(token, secret, algorithms=['HS256'])"
-                    ),
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=node.lineno,
+                        description=(
+                            "jwt.decode() called without 'algorithms' parameter. "
+                            "This may allow the 'none' algorithm attack."
+                        ),
+                        remediation=(
+                            "Always specify: jwt.decode(token, secret, algorithms=['HS256'])"
+                        ),
+                    )
+                )
         return violations
 
 
 # ---------------------------------------------------------------------------
 # RULE-007 — Insecure Cryptography
 # ---------------------------------------------------------------------------
+
 
 class InsecureCryptographyRule(Rule):
     """
@@ -357,13 +386,20 @@ class InsecureCryptographyRule(Rule):
     severity = "HIGH"
 
     _WEAK = frozenset({"md5", "sha1", "sha", "md4", "md2"})
-    _WEAK_MODULES = frozenset({
-        "Crypto.Cipher.DES", "Crypto.Cipher.ARC4",
-        "Crypto.Hash.MD5", "Crypto.Hash.SHA1",
-        "Cryptodome.Cipher.DES", "Cryptodome.Hash.MD5",
-    })
+    _WEAK_MODULES = frozenset(
+        {
+            "Crypto.Cipher.DES",
+            "Crypto.Cipher.ARC4",
+            "Crypto.Hash.MD5",
+            "Crypto.Hash.SHA1",
+            "Cryptodome.Cipher.DES",
+            "Cryptodome.Hash.MD5",
+        }
+    )
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         try:
             tree = ast.parse(code)
@@ -383,16 +419,18 @@ class InsecureCryptographyRule(Rule):
                 and func.value.id == "hashlib"
                 and attr in self._WEAK
             ):
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=node.lineno,
-                    description=(
-                        f"hashlib.{func.attr}() uses a broken algorithm. "
-                        f"{func.attr.upper()} is vulnerable to collision attacks."
-                    ),
-                    remediation="Replace with hashlib.sha256() or hashlib.sha3_256(). For passwords use scrypt/argon2.",
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=node.lineno,
+                        description=(
+                            f"hashlib.{func.attr}() uses a broken algorithm. "
+                            f"{func.attr.upper()} is vulnerable to collision attacks."
+                        ),
+                        remediation="Replace with hashlib.sha256() or hashlib.sha3_256(). For passwords use scrypt/argon2.",
+                    )
+                )
             # hashlib.new("md5", …)
             if (
                 isinstance(func.value, ast.Name)
@@ -403,13 +441,15 @@ class InsecureCryptographyRule(Rule):
                 and isinstance(node.args[0].value, str)
                 and node.args[0].value.lower() in self._WEAK
             ):
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=node.lineno,
-                    description=f"hashlib.new('{node.args[0].value}') uses a broken hash algorithm.",
-                    remediation="Replace with hashlib.new('sha256') or hashlib.sha256().",
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=node.lineno,
+                        description=f"hashlib.new('{node.args[0].value}') uses a broken hash algorithm.",
+                        remediation="Replace with hashlib.new('sha256') or hashlib.sha256().",
+                    )
+                )
 
         # Check imports of known-weak Crypto modules
         for node in ast.walk(tree):
@@ -417,19 +457,22 @@ class InsecureCryptographyRule(Rule):
                 for alias in node.names:
                     full = f"{node.module}.{alias.name}"
                     if full in self._WEAK_MODULES:
-                        violations.append(PolicyViolation(
-                            rule_name=self.name,
-                            severity=self.severity,
-                            line_number=node.lineno,
-                            description=f"Import of weak cryptographic module: {full}",
-                            remediation="Use AES-256-GCM or ChaCha20-Poly1305 via the 'cryptography' library.",
-                        ))
+                        violations.append(
+                            PolicyViolation(
+                                rule_name=self.name,
+                                severity=self.severity,
+                                line_number=node.lineno,
+                                description=f"Import of weak cryptographic module: {full}",
+                                remediation="Use AES-256-GCM or ChaCha20-Poly1305 via the 'cryptography' library.",
+                            )
+                        )
         return violations
 
 
 # ---------------------------------------------------------------------------
 # RULE-008 — Server-Side Request Forgery (SSRF)
 # ---------------------------------------------------------------------------
+
 
 class SSRFRule(Rule):
     """
@@ -442,12 +485,24 @@ class SSRFRule(Rule):
     name = "RULE-008-SSRF"
     severity = "HIGH"
 
-    _HTTP_METHODS = frozenset({
-        "get", "post", "put", "patch", "delete", "head", "options", "request",
-        "urlopen", "urlretrieve",
-    })
+    _HTTP_METHODS = frozenset(
+        {
+            "get",
+            "post",
+            "put",
+            "patch",
+            "delete",
+            "head",
+            "options",
+            "request",
+            "urlopen",
+            "urlretrieve",
+        }
+    )
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         try:
             tree = ast.parse(code)
@@ -467,25 +522,28 @@ class SSRFRule(Rule):
             url_arg = node.args[0]
             # Only flag non-constant (dynamic) URLs — they might be user-controlled
             if not isinstance(url_arg, ast.Constant):
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=node.lineno,
-                    description=(
-                        f"{func.attr}() receives a dynamic URL that may be user-controlled. "
-                        "An attacker could redirect the request to internal services."
-                    ),
-                    remediation=(
-                        "Validate the URL against an allowlist: use urllib.parse.urlparse() "
-                        "to check the scheme and hostname before making the request."
-                    ),
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=node.lineno,
+                        description=(
+                            f"{func.attr}() receives a dynamic URL that may be user-controlled. "
+                            "An attacker could redirect the request to internal services."
+                        ),
+                        remediation=(
+                            "Validate the URL against an allowlist: use urllib.parse.urlparse() "
+                            "to check the scheme and hostname before making the request."
+                        ),
+                    )
+                )
         return violations
 
 
 # ---------------------------------------------------------------------------
 # RULE-009 — Broken Object-Level Authorization (BOLA/IDOR)
 # ---------------------------------------------------------------------------
+
 
 class BrokenObjectAuthRule(Rule):
     """
@@ -510,7 +568,9 @@ class BrokenObjectAuthRule(Rule):
         re.IGNORECASE,
     )
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         try:
             tree = ast.parse(code)
@@ -527,29 +587,36 @@ class BrokenObjectAuthRule(Rule):
                 continue
             first_arg = node.args[0]
             # We can only analyse string literals
-            if not isinstance(first_arg, ast.Constant) or not isinstance(first_arg.value, str):
+            if not isinstance(first_arg, ast.Constant) or not isinstance(
+                first_arg.value, str
+            ):
                 continue
             query = first_arg.value
-            if self._ID_ONLY_PATTERN.search(query) and not self._OWNER_COLUMNS.search(query):
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=node.lineno,
-                    description=(
-                        "Database query filters only on 'id' without an ownership column "
-                        "(user_id/owner_id/etc.). An attacker may access another user's data."
-                    ),
-                    remediation=(
-                        "Add an ownership check: WHERE id = ? AND user_id = ?. "
-                        "Always scope resource lookups to the authenticated user's identity."
-                    ),
-                ))
+            if self._ID_ONLY_PATTERN.search(query) and not self._OWNER_COLUMNS.search(
+                query
+            ):
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=node.lineno,
+                        description=(
+                            "Database query filters only on 'id' without an ownership column "
+                            "(user_id/owner_id/etc.). An attacker may access another user's data."
+                        ),
+                        remediation=(
+                            "Add an ownership check: WHERE id = ? AND user_id = ?. "
+                            "Always scope resource lookups to the authenticated user's identity."
+                        ),
+                    )
+                )
         return violations
 
 
 # ---------------------------------------------------------------------------
 # RULE-010 — Insecure Design
 # ---------------------------------------------------------------------------
+
 
 class InsecureDesignRule(Rule):
     """
@@ -573,7 +640,9 @@ class InsecureDesignRule(Rule):
         r"""['"](10\.\d+\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+|192\.168\.\d+\.\d+)['"]"""
     )
 
-    def evaluate(self, code: str, filename: str, context: Dict[str, Any]) -> List[PolicyViolation]:
+    def evaluate(
+        self, code: str, filename: str, context: Dict[str, Any]
+    ) -> List[PolicyViolation]:
         violations = []
         try:
             tree = ast.parse(code)
@@ -591,38 +660,44 @@ class InsecureDesignRule(Rule):
                             and isinstance(kw.value, ast.Constant)
                             and kw.value.value is True
                         ):
-                            violations.append(PolicyViolation(
-                                rule_name=self.name,
-                                severity="CRITICAL",
-                                line_number=node.lineno,
-                                description=(
-                                    "debug=True enables the interactive debugger in production. "
-                                    "This allows arbitrary code execution by anyone with browser access."
-                                ),
-                                remediation="Remove debug=True or gate it behind an environment variable check.",
-                            ))
+                            violations.append(
+                                PolicyViolation(
+                                    rule_name=self.name,
+                                    severity="CRITICAL",
+                                    line_number=node.lineno,
+                                    description=(
+                                        "debug=True enables the interactive debugger in production. "
+                                        "This allows arbitrary code execution by anyone with browser access."
+                                    ),
+                                    remediation="Remove debug=True or gate it behind an environment variable check.",
+                                )
+                            )
 
         # Regex-based checks on the raw source (AST won't see all assignment forms)
         for lineno, line in enumerate(code.splitlines(), start=1):
             if self._HARDCODED_KEY.search(line):
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity=self.severity,
-                    line_number=lineno,
-                    description="Hardcoded secret/API key found. Secrets must not be stored in source code.",
-                    remediation=(
-                        "Load secrets from environment variables: "
-                        "os.environ['SECRET_KEY'] or use a secrets manager."
-                    ),
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity=self.severity,
+                        line_number=lineno,
+                        description="Hardcoded secret/API key found. Secrets must not be stored in source code.",
+                        remediation=(
+                            "Load secrets from environment variables: "
+                            "os.environ['SECRET_KEY'] or use a secrets manager."
+                        ),
+                    )
+                )
             if self._PRIVATE_IP.search(line):
-                violations.append(PolicyViolation(
-                    rule_name=self.name,
-                    severity="MEDIUM",
-                    line_number=lineno,
-                    description="Hardcoded private IP address found. Infrastructure addresses should be configurable.",
-                    remediation="Move IP addresses to environment variables or a configuration file.",
-                ))
+                violations.append(
+                    PolicyViolation(
+                        rule_name=self.name,
+                        severity="MEDIUM",
+                        line_number=lineno,
+                        description="Hardcoded private IP address found. Infrastructure addresses should be configurable.",
+                        remediation="Move IP addresses to environment variables or a configuration file.",
+                    )
+                )
 
         return violations
 
@@ -630,6 +705,7 @@ class InsecureDesignRule(Rule):
 # ---------------------------------------------------------------------------
 # Policy Engine
 # ---------------------------------------------------------------------------
+
 
 class PolicyEngine:
     """

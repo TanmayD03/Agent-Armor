@@ -54,19 +54,20 @@ _DEFAULT_CHAIN_PATH = Path(".agent-armor") / "shadow-chain.json"
 @dataclass
 class ChainEntry:
     """A single entry in the Shadow-Chain."""
+
     signature: str
     timestamp: str
     filename: str
     invariants: dict
-    prev_hash: str        # SHA-256 of the previous entry's signature + timestamp
+    prev_hash: str  # SHA-256 of the previous entry's signature + timestamp
 
     def to_dict(self) -> dict:
         return {
-            "signature":  self.signature,
-            "timestamp":  self.timestamp,
-            "filename":   self.filename,
+            "signature": self.signature,
+            "timestamp": self.timestamp,
+            "filename": self.filename,
             "invariants": self.invariants,
-            "prev_hash":  self.prev_hash,
+            "prev_hash": self.prev_hash,
         }
 
     @classmethod
@@ -194,7 +195,9 @@ class ShadowChainManager:
         try:
             if self._path.exists():
                 data = json.loads(self._path.read_text(encoding="utf-8"))
-                self._entries = [ChainEntry.from_dict(e) for e in data.get("entries", [])]
+                self._entries = [
+                    ChainEntry.from_dict(e) for e in data.get("entries", [])
+                ]
         except Exception:
             self._entries = []
 

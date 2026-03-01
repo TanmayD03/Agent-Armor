@@ -30,9 +30,10 @@ from typing import List
 @dataclass
 class ASTFinding:
     """Represents a single finding from the AST Hardening Engine."""
+
     node_type: str
     line_number: int
-    severity: str           # CRITICAL | HIGH | MEDIUM | LOW
+    severity: str  # CRITICAL | HIGH | MEDIUM | LOW
     description: str
     suggestion: str
 
@@ -93,26 +94,40 @@ _DANGEROUS_IMPORTS: dict[str, tuple[str, str]] = {
     "pickle": ("HIGH", "pickle is unsafe for deserialising untrusted data; use JSON."),
     "marshal": ("HIGH", "marshal is unsafe for untrusted data."),
     "shelve": ("MEDIUM", "shelve uses pickle internally; avoid with untrusted data."),
-    "yaml": ("MEDIUM", "yaml.load() without Loader= allows arbitrary code execution; use yaml.safe_load()."),
+    "yaml": (
+        "MEDIUM",
+        "yaml.load() without Loader= allows arbitrary code execution; use yaml.safe_load().",
+    ),
 }
 
 # ---------------------------------------------------------------------------
 # Insecure cryptography registry
 # ---------------------------------------------------------------------------
 # Maps hashlib / Crypto algorithm name → (severity, description, suggestion)
-_WEAK_HASH_ALGOS: frozenset[str] = frozenset({
-    "md5", "sha1", "sha", "md4", "md2", "rc4", "des", "3des",
-})
+_WEAK_HASH_ALGOS: frozenset[str] = frozenset(
+    {
+        "md5",
+        "sha1",
+        "sha",
+        "md4",
+        "md2",
+        "rc4",
+        "des",
+        "3des",
+    }
+)
 
 # cryptography / PyCryptodome module paths that are always weak
-_WEAK_CRYPTO_MODULES: frozenset[str] = frozenset({
-    "Crypto.Cipher.DES",
-    "Crypto.Cipher.ARC4",
-    "Crypto.Hash.MD5",
-    "Crypto.Hash.SHA1",
-    "Cryptodome.Cipher.DES",
-    "Cryptodome.Hash.MD5",
-})
+_WEAK_CRYPTO_MODULES: frozenset[str] = frozenset(
+    {
+        "Crypto.Cipher.DES",
+        "Crypto.Cipher.ARC4",
+        "Crypto.Hash.MD5",
+        "Crypto.Hash.SHA1",
+        "Cryptodome.Cipher.DES",
+        "Cryptodome.Hash.MD5",
+    }
+)
 
 # ---------------------------------------------------------------------------
 # ReDoS — regex patterns that can cause catastrophic backtracking
@@ -122,18 +137,34 @@ _WEAK_CRYPTO_MODULES: frozenset[str] = frozenset({
 
 _REDOS_PATTERNS: list[tuple[_re_module.Pattern[str], str]] = [
     # (a+)+ / (a*)* / (a+)* nested quantifiers
-    (_re_module.compile(r'\([^)]*[+*][^)]*\)[+*?]'), "Nested quantifier (X+)+ or (X*)* causes catastrophic backtracking."),
+    (
+        _re_module.compile(r"\([^)]*[+*][^)]*\)[+*?]"),
+        "Nested quantifier (X+)+ or (X*)* causes catastrophic backtracking.",
+    ),
     # alternation with overlap: (a|a)+ / (a|ab)+
-    (_re_module.compile(r'\([^)]*\|[^)]*\)[+*]{1}'), "Overlapping alternation with quantifier can cause ReDoS."),
+    (
+        _re_module.compile(r"\([^)]*\|[^)]*\)[+*]{1}"),
+        "Overlapping alternation with quantifier can cause ReDoS.",
+    ),
 ]
 
 # ---------------------------------------------------------------------------
 # SSRF sink patterns — attribute names on requests / httpx / urllib
 # ---------------------------------------------------------------------------
-_SSRF_HTTP_FUNCS: frozenset[str] = frozenset({
-    "get", "post", "put", "patch", "delete", "head", "options", "request",
-    "urlopen", "urlretrieve",
-})
+_SSRF_HTTP_FUNCS: frozenset[str] = frozenset(
+    {
+        "get",
+        "post",
+        "put",
+        "patch",
+        "delete",
+        "head",
+        "options",
+        "request",
+        "urlopen",
+        "urlretrieve",
+    }
+)
 
 
 class _SecurityVisitor(ast.NodeVisitor):
@@ -206,7 +237,11 @@ class _SecurityVisitor(ast.NodeVisitor):
             # subprocess(..., shell=True)
             if attr in ("run", "Popen", "call", "check_output", "check_call"):
                 for kw in node.keywords:
-                    if kw.arg == "shell" and isinstance(kw.value, ast.Constant) and kw.value.value is True:
+                    if (
+                        kw.arg == "shell"
+                        and isinstance(kw.value, ast.Constant)
+                        and kw.value.value is True
+                    ):
                         self.findings.append(
                             ASTFinding(
                                 node_type="CommandInjection",
@@ -219,7 +254,10 @@ class _SecurityVisitor(ast.NodeVisitor):
 
             # pickle.loads / marshal.loads
             if attr == "loads":
-                if isinstance(func.value, ast.Name) and func.value.id in ("pickle", "marshal"):
+                if isinstance(func.value, ast.Name) and func.value.id in (
+                    "pickle",
+                    "marshal",
+                ):
                     mod = func.value.id
                     self.findings.append(
                         ASTFinding(
@@ -232,7 +270,11 @@ class _SecurityVisitor(ast.NodeVisitor):
                     )
 
             # yaml.load() without Loader= — insecure deserialization
-            if attr == "load" and isinstance(func.value, ast.Name) and func.value.id == "yaml":
+            if (
+                attr == "load"
+                and isinstance(func.value, ast.Name)
+                and func.value.id == "yaml"
+            ):
                 kw_names = {kw.arg for kw in node.keywords}
                 # safe_load is fine; load without Loader= is dangerous
                 if "Loader" not in kw_names:
@@ -315,7 +357,8 @@ class _SecurityVisitor(ast.NodeVisitor):
             if (
                 isinstance(func.value, ast.Name)
                 and func.value.id == "re"
-                and attr in ("compile", "match", "search", "fullmatch", "findall", "sub", "subn")
+                and attr
+                in ("compile", "match", "search", "fullmatch", "findall", "sub", "subn")
                 and node.args
                 and isinstance(node.args[0], ast.Constant)
                 and isinstance(node.args[0].value, str)
@@ -489,8 +532,19 @@ class ASTHardener:
         This implements the 'Semantic Over-Confidence Mitigation' concept.
         """
         findings: List[ASTFinding] = []
-        risky_attrs = {"read", "write", "connect", "execute", "get", "post", "request",
-                       "open", "send", "recv", "fetch"}
+        risky_attrs = {
+            "read",
+            "write",
+            "connect",
+            "execute",
+            "get",
+            "post",
+            "request",
+            "open",
+            "send",
+            "recv",
+            "fetch",
+        }
 
         for node in ast.walk(tree):
             if not isinstance(node, ast.FunctionDef):
@@ -505,8 +559,11 @@ class ASTHardener:
                     continue
                 func = inner.func
                 attr = (
-                    func.attr if isinstance(func, ast.Attribute) else
-                    func.id if isinstance(func, ast.Name) else None
+                    func.attr
+                    if isinstance(func, ast.Attribute)
+                    else func.id
+                    if isinstance(func, ast.Name)
+                    else None
                 )
                 if attr in risky_attrs:
                     findings.append(
@@ -532,8 +589,12 @@ class ASTHardener:
         """Flag writes to sensitive system paths."""
         findings: List[ASTFinding] = []
         sensitive_patterns = [
-            r"/etc/passwd", r"/etc/shadow", r"/etc/sudoers",
-            r"~/.ssh/", r"~/.aws/", r"C:\\Windows\\System32",
+            r"/etc/passwd",
+            r"/etc/shadow",
+            r"/etc/sudoers",
+            r"~/.ssh/",
+            r"~/.aws/",
+            r"C:\\Windows\\System32",
         ]
         for i, line in enumerate(source_code.splitlines(), 1):
             for pattern in sensitive_patterns:

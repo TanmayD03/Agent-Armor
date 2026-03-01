@@ -40,11 +40,12 @@ class SecretType(Enum):
 @dataclass
 class SecretFinding:
     """Represents a single detected secret in the source code."""
+
     secret_type: SecretType
     line_number: int
     column: int
-    masked_value: str          # e.g. "sk-live_12***ef"
-    env_var_name: str          # e.g. "AGENT_ARMOR_OPENAI_KEY"
+    masked_value: str  # e.g. "sk-live_12***ef"
+    env_var_name: str  # e.g. "AGENT_ARMOR_OPENAI_KEY"
     severity: str = "CRITICAL"
 
     @property
@@ -65,72 +66,82 @@ class SecretFinding:
 # ---------------------------------------------------------------------------
 _RAW_PATTERNS: List[Tuple[SecretType, str, str]] = [
     # AWS
-    (SecretType.AWS_ACCESS_KEY,
-     r"\bAKIA[0-9A-Z]{16}\b",
-     "AGENT_ARMOR_AWS_ACCESS_KEY"),
-
-    (SecretType.AWS_SECRET_KEY,
-     r'(?i)aws[_\-\s]?secret[_\-\s]?(?:access[_\-\s]?)?key\s*[=:]\s*["\']([A-Za-z0-9/+=]{40})["\']',
-     "AGENT_ARMOR_AWS_SECRET_KEY"),
-
+    (SecretType.AWS_ACCESS_KEY, r"\bAKIA[0-9A-Z]{16}\b", "AGENT_ARMOR_AWS_ACCESS_KEY"),
+    (
+        SecretType.AWS_SECRET_KEY,
+        r'(?i)aws[_\-\s]?secret[_\-\s]?(?:access[_\-\s]?)?key\s*[=:]\s*["\']([A-Za-z0-9/+=]{40})["\']',
+        "AGENT_ARMOR_AWS_SECRET_KEY",
+    ),
     # OpenAI
-    (SecretType.OPENAI_KEY,
-     r"\bsk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}\b"
-     r"|\bsk-proj-[a-zA-Z0-9_\-]{40,}\b"
-     r"|\bsk-[a-zA-Z0-9]{48}\b",
-     "AGENT_ARMOR_OPENAI_API_KEY"),
-
+    (
+        SecretType.OPENAI_KEY,
+        r"\bsk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}\b"
+        r"|\bsk-proj-[a-zA-Z0-9_\-]{40,}\b"
+        r"|\bsk-[a-zA-Z0-9]{48}\b",
+        "AGENT_ARMOR_OPENAI_API_KEY",
+    ),
     # GitHub tokens  (classic PATs: ghp_/gho_/ghu_/ghs_/ghr_ + 36 chars; fine-grained are longer)
-    (SecretType.GITHUB_TOKEN,
-     r"\bgh[pousx]_[a-zA-Z0-9]{30,}\b",
-     "AGENT_ARMOR_GITHUB_TOKEN"),
-
+    (
+        SecretType.GITHUB_TOKEN,
+        r"\bgh[pousx]_[a-zA-Z0-9]{30,}\b",
+        "AGENT_ARMOR_GITHUB_TOKEN",
+    ),
     # GitLab PAT
-    (SecretType.GITLAB_TOKEN,
-     r"\bglpat-[a-zA-Z0-9_\-]{20}\b",
-     "AGENT_ARMOR_GITLAB_TOKEN"),
-
+    (
+        SecretType.GITLAB_TOKEN,
+        r"\bglpat-[a-zA-Z0-9_\-]{20}\b",
+        "AGENT_ARMOR_GITLAB_TOKEN",
+    ),
     # JWT
-    (SecretType.JWT_TOKEN,
-     r"\beyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.~+/]+=*\b",
-     "AGENT_ARMOR_JWT_TOKEN"),
-
+    (
+        SecretType.JWT_TOKEN,
+        r"\beyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-\.~+/]+=*\b",
+        "AGENT_ARMOR_JWT_TOKEN",
+    ),
     # Stripe
-    (SecretType.STRIPE_KEY,
-     r"\bsk_(?:live|test)_[a-zA-Z0-9]{24}\b",
-     "AGENT_ARMOR_STRIPE_API_KEY"),
-
+    (
+        SecretType.STRIPE_KEY,
+        r"\bsk_(?:live|test)_[a-zA-Z0-9]{24}\b",
+        "AGENT_ARMOR_STRIPE_API_KEY",
+    ),
     # Slack
-    (SecretType.SLACK_TOKEN,
-     r"\bxox[bprs]-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24}\b",
-     "AGENT_ARMOR_SLACK_TOKEN"),
-
+    (
+        SecretType.SLACK_TOKEN,
+        r"\bxox[bprs]-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24}\b",
+        "AGENT_ARMOR_SLACK_TOKEN",
+    ),
     # Google
-    (SecretType.GOOGLE_KEY,
-     r"\bAIza[0-9A-Za-z_\-]{35}\b",
-     "AGENT_ARMOR_GOOGLE_API_KEY"),
-
+    (
+        SecretType.GOOGLE_KEY,
+        r"\bAIza[0-9A-Za-z_\-]{35}\b",
+        "AGENT_ARMOR_GOOGLE_API_KEY",
+    ),
     # Database URLs with embedded credentials
-    (SecretType.DATABASE_URL,
-     r"(?i)(postgresql|mysql|mongodb|redis|mssql|sqlite)://[^:]+:[^@\s\"']+@[^\s\"']+",
-     "AGENT_ARMOR_DATABASE_URL"),
-
+    (
+        SecretType.DATABASE_URL,
+        r"(?i)(postgresql|mysql|mongodb|redis|mssql|sqlite)://[^:]+:[^@\s\"']+@[^\s\"']+",
+        "AGENT_ARMOR_DATABASE_URL",
+    ),
     # PEM private keys
-    (SecretType.PRIVATE_KEY,
-     r"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",
-     "AGENT_ARMOR_PRIVATE_KEY"),
-
+    (
+        SecretType.PRIVATE_KEY,
+        r"-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",
+        "AGENT_ARMOR_PRIVATE_KEY",
+    ),
     # Generic named key/token assignments
-    (SecretType.GENERIC_API_KEY,
-     r'(?i)(?:api[_\-]?key|apikey|api[_\-]?secret|secret[_\-]?key|'
-     r'access[_\-]?token|auth[_\-]?token|bearer)\s*(?:=|:)\s*'
-     r'["\']([a-zA-Z0-9_\-\.\/+]{20,})["\']',
-     "AGENT_ARMOR_API_KEY"),
-
+    (
+        SecretType.GENERIC_API_KEY,
+        r"(?i)(?:api[_\-]?key|apikey|api[_\-]?secret|secret[_\-]?key|"
+        r"access[_\-]?token|auth[_\-]?token|bearer)\s*(?:=|:)\s*"
+        r'["\']([a-zA-Z0-9_\-\.\/+]{20,})["\']',
+        "AGENT_ARMOR_API_KEY",
+    ),
     # Hardcoded passwords
-    (SecretType.HARDCODED_PASSWORD,
-     r'(?i)(?:password|passwd|pwd)\s*(?:=|:)\s*["\']([^\s"\']{8,})["\']',
-     "AGENT_ARMOR_PASSWORD"),
+    (
+        SecretType.HARDCODED_PASSWORD,
+        r'(?i)(?:password|passwd|pwd)\s*(?:=|:)\s*["\']([^\s"\']{8,})["\']',
+        "AGENT_ARMOR_PASSWORD",
+    ),
 ]
 
 
@@ -226,7 +237,9 @@ class SecretScrubber:
     def _build_replacement(matched: str, env_var: str) -> str:
         """Build the safe replacement string for a regex match."""
         # If the match starts with a key= prefix, preserve it
-        eq_match = re.match(r'^((?:api_key|secret|token|password|key)\s*=\s*)', matched, re.I)
+        eq_match = re.match(
+            r"^((?:api_key|secret|token|password|key)\s*=\s*)", matched, re.I
+        )
         if eq_match:
             prefix = eq_match.group(1)
             return f'{prefix}os.getenv("{env_var}")'
@@ -241,9 +254,7 @@ class SecretScrubber:
         for ch in text:
             freq[ch] = freq.get(ch, 0) + 1
         length = len(text)
-        return -sum(
-            (c / length) * math.log2(c / length) for c in freq.values() if c
-        )
+        return -sum((c / length) * math.log2(c / length) for c in freq.values() if c)
 
     def _entropy_scan(self, original: str, scrubbed: str) -> List[SecretFinding]:
         """

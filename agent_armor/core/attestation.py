@@ -58,8 +58,9 @@ _INVARIANTS_RE = re.compile(
 @dataclass
 class Attestation:
     """Represents a single cryptographic attestation for a code block."""
-    signature: str                      # SHA-256 hex digest
-    timestamp: str                      # ISO-8601 UTC
+
+    signature: str  # SHA-256 hex digest
+    timestamp: str  # ISO-8601 UTC
     invariants: Dict[str, Any] = field(default_factory=dict)
     version: str = _ATTESTATION_VERSION
     filename: str = "unknown"
@@ -171,17 +172,17 @@ class AttestationEngine:
         Used so the signature covers the *security posture* of the code.
         """
         critical_ast = [f for f in ast_findings if f.severity == "CRITICAL"]
-        sql_issues   = [f for f in ast_findings if f.node_type == "SQLInjection"]
-        cmd_issues   = [f for f in ast_findings if f.node_type == "CommandInjection"]
-        high_pkgs    = [f for f in package_findings if f.severity in ("CRITICAL", "HIGH")]
+        sql_issues = [f for f in ast_findings if f.node_type == "SQLInjection"]
+        cmd_issues = [f for f in ast_findings if f.node_type == "CommandInjection"]
+        high_pkgs = [f for f in package_findings if f.severity in ("CRITICAL", "HIGH")]
 
         return {
-            "no_secrets":           len(secret_findings) == 0,
-            "no_dangerous_sinks":   len(critical_ast) == 0,
-            "no_sql_injection":     len(sql_issues) == 0,
+            "no_secrets": len(secret_findings) == 0,
+            "no_dangerous_sinks": len(critical_ast) == 0,
+            "no_sql_injection": len(sql_issues) == 0,
             "no_command_injection": len(cmd_issues) == 0,
             "no_unsanitised_flows": len(dtg_findings) == 0,
-            "deps_validated":       len(high_pkgs) == 0,
+            "deps_validated": len(high_pkgs) == 0,
         }
 
     # ------------------------------------------------------------------
@@ -201,7 +202,8 @@ class AttestationEngine:
         """Remove existing @agent-armor-* header lines."""
         lines = code.splitlines(keepends=True)
         cleaned = [
-            line for line in lines
+            line
+            for line in lines
             if not line.lstrip().startswith("# @agent-armor-")
             and not line.lstrip().startswith("# @invariants:")
             and not line.lstrip().startswith("# @version:")
