@@ -27,7 +27,6 @@ from typing import Optional
 
 import click
 from rich.console import Console
-from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.table import Table
@@ -402,8 +401,7 @@ def badge(repo: str) -> None:
         "https://img.shields.io/badge/AgentArmor-Attested%20%26%20Secure-brightgreen"
         "?logo=shield&labelColor=1a1a2e&style=flat-square"
     )
-    markdown = f"[![AgentArmor Protected]({badge_url})](https://github.com/yourusername/agent-armor)"
-    shield_io = f"[![AgentArmor Protected]({badge_url})]({repo})"
+    markdown = f"[![AgentArmor Protected]({badge_url})](https://github.com/TanmayD03/Agent-Armor)"
 
     console.print(
         Panel(
