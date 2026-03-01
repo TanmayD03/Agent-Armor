@@ -17,7 +17,7 @@
 
 <br/>
 
-**[📦 Install](#-installation) · [🚀 Quickstart](#-30-second-quickstart) · [📖 Docs](#-feature-overview) · [🏛️ Examples](examples/) · [🤝 Contribute](CONTRIBUTING.md)**
+**[📦 Install](#-installation) · [🚀 Quickstart](#-30-second-quickstart) · [📖 Docs](#-feature-overview) · [🏛️ Examples](examples/) · [🔐 Threat Model](THREAT_MODEL.md) · [🤝 Contribute](CONTRIBUTING.md)**
 
 </div>
 

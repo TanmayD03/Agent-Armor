@@ -6,6 +6,9 @@ AgentArmor is a security tool — it is therefore held to a higher standard than
 average open-source project. We take vulnerability reports in AgentArmor itself very
 seriously and aim to respond and fix confirmed issues faster than any other project.
 
+For a detailed analysis of threats against kvlr and the systems it protects, see
+[THREAT_MODEL.md](THREAT_MODEL.md).
+
 ---
 
 ## Supported Versions
